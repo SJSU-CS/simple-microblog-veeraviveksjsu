@@ -53,7 +53,6 @@ public class ClientApplication implements CommandLineRunner, ExitCodeGenerator {
         try (BufferedReader reader = new BufferedReader(new FileReader("mb.ini"))) {
             username = reader.readLine();
             encodedPrivateKey = reader.readLine();
-            System.out.println(encodedPrivateKey);
 
             PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(
                     Base64.getDecoder().decode(encodedPrivateKey));
@@ -76,9 +75,8 @@ public class ClientApplication implements CommandLineRunner, ExitCodeGenerator {
             signer.initSign(privateKey);
             signer.update(messageHash);
             messageBody.put("signature", Base64.getEncoder().encodeToString(signer.sign()));
-
             ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                    "http://veeravivek.my.to/messages/create",
+                    "https://veeravivek.my.to/messages/create",
                     HttpMethod.POST,
                     new HttpEntity<>(messageBody),
                     new ParameterizedTypeReference<Map<String, Object>>() {
@@ -116,14 +114,13 @@ public class ClientApplication implements CommandLineRunner, ExitCodeGenerator {
                 writer.write(id + "\n" + privateKeyString);
             }
 
-            System.out.println("User created successfully. User ID: " + id);
             ClientUser clientUser = new ClientUser();
             clientUser.setUser(id);
             clientUser.setPublicKey(Base64.getEncoder().encodeToString(keyPair.getPublic().getEncoded()));
 
             // Send POST request and get response
             ResponseEntity<Map<String, String>> response = restTemplate.exchange(
-                    "http://veeravivek.my.to/user/create",
+                    "https://veeravivek.my.to/user/create",
                     HttpMethod.POST,
                     new HttpEntity<>(clientUser),
                     new ParameterizedTypeReference<Map<String, String>>() {
@@ -141,7 +138,7 @@ public class ClientApplication implements CommandLineRunner, ExitCodeGenerator {
              @CommandLine.Option(names = {"--save-attachment"}, defaultValue = "false") boolean saveAttachment) {
         try {
             ResponseEntity<List<Map<String, Object>>> messages = restTemplate.exchange(
-                    "http://veeravivek.my.to/messages/list",
+                    "https://veeravivek.my.to/messages/list",
                     HttpMethod.POST,
                     new HttpEntity<>(Map.of("limit", count, "next", startingIndex)),
                     new ParameterizedTypeReference<List<Map<String, Object>>>() {
@@ -159,7 +156,6 @@ public class ClientApplication implements CommandLineRunner, ExitCodeGenerator {
                         Files.write(filePath, attachmentBytes, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
                     }
                 }
-                messageString += "\n";
                 System.out.println(messageString);
             }
         } catch (Exception e) {

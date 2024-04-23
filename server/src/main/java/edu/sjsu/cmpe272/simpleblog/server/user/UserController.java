@@ -26,7 +26,7 @@ public class UserController {
         }
         String publicKey = userTable.getPublicKey().replace("-----BEGIN PUBLIC KEY-----\\n", "");
         publicKey = publicKey.replace("\\n-----END PUBLIC KEY-----\\n", "");
-        userTable.setUserName(publicKey);
+        userTable.setPublicKey(publicKey);
         userRepository.save(userTable);
         return ResponseEntity.ok(Map.of("message", "welcome"));
 
